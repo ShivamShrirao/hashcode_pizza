@@ -25,15 +25,6 @@ for i in range(len(inp)):
 
 svd_inp=inp.copy()
 
-def find_hole(x,y):
-	for i in range(rows):
-		for j in range(cols):
-			if inp[i][j]=='T' or inp[i][j]=='M':
-				if i==x and j==y:
-					pass
-				else:
-					return i,j
-
 class slice:
 	def __init__(self):
 		self.st_r = 0
@@ -211,7 +202,5 @@ for sl in slices:
 		f.write("{0} {1} {2} {3}\n".format(sl.st_r,sl.st_c,sl.end_r,sl.end_c))
 		total+=sl.get_size()
 f.close()
-for p in inp:
-	print(p)
 print("Total points:", total)
 print("Max possible:", rows*cols)
