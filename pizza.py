@@ -23,7 +23,7 @@ H=int(inp.pop(0))
 for i in range(len(inp)):
 	inp[i]=list(inp[i])
 
-svd_inp=inp.copy()
+# svd_inp=inp.copy()
 
 class slice:
 	def __init__(self):
@@ -127,7 +127,7 @@ class slice:
 		self.tomato+=toms
 		self.mush+=msh
 
-	def fill_none(self, num):
+	def fill_some(self, num):
 		for i in range(self.st_r,self.end_r+1):
 			for j in range(self.st_c,self.end_c+1):
 				inp[i][j]=num
@@ -173,7 +173,7 @@ while st<rows*cols:
 			slices[-1].satisfy=True
 			print('\r',x,y,end='')
 			st=0
-			slices[-1].fill_none(len(slices)-1)
+			slices[-1].fill_some(len(slices)-1)
 			break
 		size=slices[-1].get_size()
 
@@ -191,13 +191,97 @@ while st<rows*cols:
 	slices[-1].end_c=slices[-1].st_c=y
 
 print('\n')
-total=0
+
+def get_holes():
+	done=False
+	for x in range(rows):
+		for y in range(cols):
+			if inp[x][y]=='T' or inp[x][y]=='M':
+				try:
+					uu=inp[x-1][y]
+					uu+=0
+				except:
+					uu=None
+				try:
+					rt=inp[x][y+1]
+					rt+=0
+				except:
+					rt=None
+				try:
+					lt=inp[x][y-1]
+					lt+=0
+				except:
+					lt=None
+				try:
+					dn=inp[x+1][y]
+					dn+=0
+				except:
+					dn=None
+				avs=[]
+				if uu is not None:
+					if slices[uu].get_size()<H:
+						avs.append('uu')
+				if rt is not None:
+					if slices[rt].get_size()<H:
+						avs.append('rt')
+				if lt is not None:
+					if slices[lt].get_size()<H:
+						avs.append('lt')
+				if dn is not None:
+					if slices[dn].get_size()<H:
+						avs.append('dn')
+				ll=len(avs)
+				for nu in range(ll):
+					if avs[nu]=='uu':
+						mts = slices[uu].count_down()
+						if mts!=(0,0):
+							slices[uu].end_r+=1
+							if slices[uu].get_size()>H:
+								slices[uu].end_r-=1
+							else:
+								slices[uu].satisfy=True
+								done=True
+								slices[uu].fill_some(uu)
+					elif avs[nu]=='rt':
+						mts = slices[rt].count_left()
+						if mts!=(0,0):
+							slices[rt].st_c-=1
+							if slices[rt].get_size()>H:
+								slices[rt].st_c+=1
+							else:
+								slices[rt].satisfy=True
+								done=True
+								slices[rt].fill_some(rt)
+					elif avs[nu]=='lt':
+						mts = slices[lt].count_right()
+						if mts!=(0,0):
+							slices[lt].end_c+=1
+							if slices[lt].get_size()>H:
+								slices[lt].end_c-=1
+							else:
+								slices[lt].satisfy=True
+								done=True
+								slices[lt].fill_some(lt)
+					elif avs[nu]=='dn':
+						mts = slices[dn].count_up()
+						if mts!=(0,0):
+							slices[dn].st_r-=1
+							if slices[dn].get_size()>H:
+								slices[dn].st_r+=1
+							else:
+								slices[dn].satisfy=True
+								done=True
+								slices[dn].fill_some(dn)
+	return done
+
+while get_holes():
+	pass
+
 f=open(sys.argv[2],'w')
 f.write(str(len(slices)-1)+'\n')
-ss=0
+total=0
 for sl in slices:
 	if sl.satisfy:
-		ss+=1
 		print(sl.st_r,sl.st_c,sl.end_r,sl.end_c)
 		f.write("{0} {1} {2} {3}\n".format(sl.st_r,sl.st_c,sl.end_r,sl.end_c))
 		total+=sl.get_size()
